@@ -34,7 +34,7 @@ export default async function PartiesPage() {
     <div>
       <div className="mb-7 border-b border-line pb-5">
         <p className="eyebrow mb-1.5">Parties</p>
-        <h1 className="font-display text-[26px] font-bold leading-tight tracking-[-0.02em] text-fg">공대모집</h1>
+        <h1 className="font-display text-[26px] font-bold leading-tight tracking-[-0.02em] text-fg">공대지원</h1>
         <p className="mt-1.5 text-[13px] text-dim">
           파티를 열면 지원자들의 가능 시간이 겹치는 구간과 시간대별 인원이 보입니다.
         </p>
