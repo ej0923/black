@@ -28,7 +28,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
   return (
     <div>
       <Link href="/parties" className="text-[12px] text-faint transition-colors hover:text-brand">
-        ← 파티모집
+        ← 공대모집
       </Link>
 
       <div className="mb-6 mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-line pb-4">

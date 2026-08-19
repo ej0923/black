@@ -8,7 +8,7 @@ const NAV = [
   { href: "/info", label: "정보공유" },
   { href: "/register", label: "멤버등록" },
   { href: "/roster", label: "멤버목록" },
-  { href: "/parties", label: "파티모집" },
+  { href: "/parties", label: "공대모집" },
 ];
 
 export default function NavTabs() {

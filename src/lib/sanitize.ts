@@ -400,3 +400,38 @@ export function htmlToText(input: string | null | undefined): string {
     .replace(/\s+/g, " ")
     .trim();
 }
+
+/** 첫 문단을 뒤 문단과 붙지 않게 끊어줄 블록 경계 */
+const BLOCK_BOUNDARY = /<\/(?:p|div|h[1-6]|li|blockquote|pre|tr)\s*>|<br\s*\/?>/gi;
+
+/**
+ * 목록 카드에 제목과 함께 곁들일 본문 첫 문장.
+ *
+ * 문장부호(. ! ? …)가 나오면 거기서 끊고, 없으면 첫 문단을 그대로 쓴다.
+ * 이미지·표만 있는 문단은 텍스트가 비므로 건너뛰고 다음 문단을 본다.
+ *
+ * skip 을 주면 그 문구와 같은 문단도 건너뛴다. 본문 맨 위에 제목을 한 번 더 적어 둔
+ * 글이 흔한데, 그대로 두면 카드에 같은 말이 두 줄 나오기 때문이다.
+ */
+export function firstSentence(
+  html: string | null | undefined,
+  { maxLength = 120, skip = "" }: { maxLength?: number; skip?: string } = {},
+): string {
+  if (!html) return "";
+
+  const squash = (text: string) => text.replace(/\s+/g, "");
+  const skipped = squash(skip);
+
+  const first = String(html)
+    .replace(BLOCK_BOUNDARY, "\n")
+    .split("\n")
+    .map(htmlToText)
+    .find((text) => text.length > 0 && (!skipped || squash(text) !== skipped));
+  if (!first) return "";
+
+  // "3.5초" 처럼 숫자 사이의 점은 문장 끝이 아니므로 뒤에 공백/끝이 와야 인정한다.
+  const end = first.search(/[.!?…](\s|$)/);
+  const sentence = end >= 0 ? first.slice(0, end + 1) : first;
+
+  return sentence.length > maxLength ? `${sentence.slice(0, maxLength - 1).trimEnd()}…` : sentence;
+}

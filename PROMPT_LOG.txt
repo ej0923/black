@@ -753,3 +753,77 @@ anon 으로 아무것도 안 읽힘" - 실제로는 anon 전권 정책 4개가 �
 
 [검증]
   tsc --noEmit / eslint --max-warnings=0 : 통과 (exit 0)
+
+--- 2026-08-19 19:38:56 ---------------------------------------------
+[PROMPT]
+<ide_opened_file>The user opened the file d:\aion2black\supabase\schema.sql in the IDE. This may or may not be related to the current task.</ide_opened_file>
+파티모집 이름 공대모집 으로 바꿔줘
+
+[작업]
+- src/components/NavTabs.tsx        NAV 라벨 "파티모집" -> "공대모집"
+- src/app/parties/page.tsx          h1 "파티모집" -> "공대모집"
+- src/app/parties/[id]/page.tsx     뒤로가기 "← 파티모집" -> "← 공대모집"
+
+라우트(/parties)와 DB 표(parties/party_members), 코드상 party* 식별자는 그대로 뒀다.
+바꾼 건 화면에 보이는 문구뿐. PROMPT_LOG.txt 의 과거 기록에 남은 "파티모집" 도
+당시 사실이라 손대지 않았다.
+
+[검증]
+  tsc --noEmit / eslint --max-warnings=0 : 통과 (exit 0)
+  grep 결과 src/ 안에 남은 "파티모집" 없음.
+
+--- 2026-08-19 19:43:00 ---------------------------------------------
+[PROMPT]
+<ide_opened_file>The user opened the file d:\aion2black\.env.local in the IDE. This may or may not be related to the current task.</ide_opened_file>
+관리자 비밀번호가 ****** 아냐? 관리자 로그인하려고하니 ADMIN_PASSWORD 환경변수가 설정되지 않았습니다. 라고떠
+
+--- 2026-08-19 19:44:24 ---------------------------------------------
+[PROMPT]
+<task-notification>
+<task-id>b19qomqva</task-id>
+<tool-use-id>toolu_01JH2jzb83dfMg3KeC432jjc</tool-use-id>
+<output-file>C:\Users\USER\AppData\Local\Temp\claude\d--aion2black\c48aa774-8144-40f5-8ec5-c993b823df78\tasks\b19qomqva.output</output-file>
+<status>completed</status>
+<summary>Background command "Search for 파티모집 occurrences" completed (exit code 0)</summary>
+</task-notification>
+
+--- 2026-08-19 22:36:46 ---------------------------------------------
+[PROMPT]
+<ide_opened_file>The user opened the file d:\aion2black\.env.local in the IDE. This may or may not be related to the current task.</ide_opened_file>
+정보공유 페이지 글제목 카드에 제목밑에 본문 맨 위 한문장 까지 같이 나와서 두줄로 되게 하고싶어. 글씨 크기는 제목크기보다 더 작게 설정해줘.
+
+[작업]
+- src/lib/sanitize.ts
+    firstSentence(html, { maxLength = 120, skip }) 추가. 이미 있던(그러나 아무도
+    안 쓰던) htmlToText 를 재사용한다.
+      · 블록 경계(</p> </div> </h1~6> </li> </blockquote> </pre> </tr> <br>)를
+        줄바꿈으로 바꿔 첫 문단이 다음 문단과 이어붙지 않게 한다.
+      · 문장부호 [.!?…] 뒤에 공백이나 문자열 끝이 와야 문장 끝으로 인정 —
+        "3.5초" 같은 소수점에서 잘리지 않게.
+      · 문장부호가 없으면 첫 문단을 통째로 쓰고 120자에서 … 로 줄인다.
+      · 텍스트가 빈 문단(이미지·표만 있는 줄)은 건너뛴다.
+      · skip 과 (공백 제거 후) 같은 문단도 건너뛴다.
+- src/components/PostTable.tsx  (정보공유 /info 전용 — 홈은 PostBoard 라 영향 없음)
+    카드 = 제목 1줄 + 요약 1줄, 총 두 줄.
+      h3   line-clamp-3 -> line-clamp-1, 크기 18px 유지
+      p    신규. text-[13px] text-dim leading-snug, line-clamp-1, mt-1.5
+    제목+요약을 <div className="min-w-0"> 로 묶어 날짜(time)와의 justify-between
+    배치를 그대로 유지했다.
+
+skip 을 넣은 이유: 실제 글 "🗡️ 레기온 공유 PVP 세팅 🗡️" 의 본문 첫 줄이 제목과
+똑같아서 카드에 같은 문구가 두 줄 나왔다. 제목과 겹치면 다음 문단을 쓴다.
+
+[검증]
+  tsc --noEmit / eslint --max-warnings=0 : 통과 (exit 0)
+  dev 서버(임시 3100 포트)로 /info 실제 렌더 확인 — 확인 후 종료:
+    "🗺️ 하층, 중층 맵 명칭 🗺️"      -> 요약 "하층지도"
+    "🗡️ 레기온 공유 PVP 세팅 🗡️"   -> 요약 "최소 요구사항"  (skip 적용 전에는 제목과 동일)
+
+[남은 일]
+  - 3000 포트에서 돌던 dev 서버가 이 턴 도중 이미 죽어 있었다(내가 끈 게 아님).
+    확인은 3100 포트 임시 서버로 했고 그건 종료했으니, 작업 재개하려면 dev.bat 다시 실행.
+
+--- 2026-08-19 22:59:45 ---------------------------------------------
+[PROMPT]
+<ide_opened_file>The user opened the file d:\aion2black\.env.local in the IDE. This may or may not be related to the current task.</ide_opened_file>
+푸쉬해줘
