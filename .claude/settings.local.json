@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:aion2.plaync.com)",
+      "WebSearch",
+      "PowerShell(\"node: \" + \\(node -v\\); \"npm: \" + \\(npm -v\\); \"pwd: \" + \\(Get-Location\\).Path)",
+      "PowerShell(npm install @supabase/supabase-js 2>&1)",
+      "PowerShell(npm run lint 2>&1)",
+      "PowerShell(npx tsc --noEmit 2>&1)",
+      "PowerShell(npm run build 2>&1)",
+      "PowerShell(npm install pretendard @radix-ui/colors 2>&1)",
+      "PowerShell(npm install @floating-ui/react 2>&1)"
+    ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe",
+            "args": [
+              "-NoProfile",
+              "-ExecutionPolicy",
+              "Bypass",
+              "-File",
+              "d:\\aion2black\\scripts\\log-prompt.ps1"
+            ],
+            "timeout": 10,
+            "statusMessage": "logging prompt"
+          }
+        ]
+      }
+    ]
+  }
+}
