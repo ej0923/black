@@ -21,8 +21,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <div className="h-[3px] bg-[linear-gradient(90deg,#074783,#1566b3_28%,#3d94d8_52%,#ee6c2a_88%)]" />
 
         <header className="sticky top-0 z-40 border-b border-line bg-[linear-gradient(90deg,#0f171f,#17232e_55%,#0f171f)]">
-          <div className="mx-auto flex h-14 max-w-[1180px] items-stretch gap-8 px-5">
-            <Link href="/" className="flex items-center gap-2.5 self-center">
+          {/*
+            모바일에서는 한 줄에 다 들어가지 않는다. flex 아이템은 min-width 가 auto 라
+            한글 라벨이 min-content(한 글자)까지 찌그러져 세로로 쌓이므로, 좁은 화면에서는
+            wrap 으로 탭을 둘째 줄에 통째로 내린다(NavTabs 의 order-3 / w-full).
+          */}
+          <div className="mx-auto flex max-w-[1180px] flex-wrap items-center gap-x-8 px-4 sm:h-14 sm:flex-nowrap sm:items-stretch sm:px-5">
+            <Link href="/" className="order-1 flex h-12 shrink-0 items-center gap-2.5 self-center sm:h-auto">
               <span className="font-display text-[22px] font-bold leading-none tracking-[-0.02em] text-fg">
                 {TARGET_LEGION}
               </span>
@@ -34,7 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
             <NavTabs />
 
-            <div className="ml-auto flex items-center gap-3">
+            <div className="order-2 ml-auto flex shrink-0 items-center gap-3 sm:order-3">
               <Link
                 href="/admin"
                 className={

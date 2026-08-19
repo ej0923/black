@@ -827,3 +827,74 @@ skip 을 넣은 이유: 실제 글 "🗡️ 레기온 공유 PVP 세팅 🗡️"
 [PROMPT]
 <ide_opened_file>The user opened the file d:\aion2black\.env.local in the IDE. This may or may not be related to the current task.</ide_opened_file>
 푸쉬해줘
+
+[작업]
+- 커밋 7ebf1fe -> origin/main 푸시 (f7008ad..7ebf1fe). 배포가 main 에서 나가는
+  구조라 브랜치를 따로 파지 않고 main 에 직접 올렸다.
+- 푸시 전에 걸러낸 것: 이 저장소(github.com/ej0923/black)는 공개 저장소인데
+  (인증 없는 GitHub API 가 200) PROMPT_LOG.txt 778 줄에 훅이 자동 기록한
+  관리자 비밀번호가 평문으로 들어 있었다. 사용자 확인 후 그 줄만 ****** 로
+  가리고 커밋했다. .env.local 의 실제 값은 건드리지 않았다.
+  (이미 푸시돼 있던 커밋에는 비밀번호가 없어 히스토리 세탁은 불필요했다.)
+  20 줄 anon 키는 잘려 있고 원래 공개용이라 그대로 뒀다.
+
+[남은 일]
+  - 훅(scripts/log-prompt.ps1)이 프롬프트를 그대로 적으므로 같은 유출이 또 난다.
+    마스킹을 넣든 PROMPT_LOG.txt 를 추적 해제하든 정해야 함.
+  - Vercel 환경변수 4개는 여전히 미설정 — 배포본 관리자 로그인은 아직 안 된다.
+
+--- 2026-08-19 23:11:30 ---------------------------------------------
+[PROMPT]
+정보공유 카드 큰 제목 밑글자 16px으로 해줘.
+
+[작업]
+- src/components/PostTable.tsx
+    요약줄(본문 첫 문장) 글씨 크기 text-[13px] -> text-[16px].
+    제목은 18px 그대로라 여전히 요약이 더 작다. 색(text-dim)과 line-clamp-1 은 유지.
+
+[검증]
+  tsc --noEmit / eslint --max-warnings=0 : 통과 (exit 0)
+  dev 서버는 내려가 있어 화면 확인은 못 했다. CSS 클래스 한 개 교체라 렌더 위험은 없음.
+
+--- 2026-08-19 23:18:00 ---------------------------------------------
+[PROMPT]
+모바일로 보면 헤더글씨가 세로로 바껴
+
+[작업]
+원인: 헤더 안쪽 줄이 h-14 한 줄짜리 flex 인데 모바일 폭에 내용이 다 안 들어간다.
+flex 아이템은 min-width 가 auto = min-content 인데, 한글은 글자 사이에서 줄바꿈이
+되므로 min-content 가 "한 글자" 다. 그래서 라벨이 세로로 쌓였다.
+(폭 계산: 브랜드 ~110 + 탭 ~360 + 관리자 ~40 + 여백 ~110 = 620px 가량 필요)
+
+- src/app/layout.tsx  헤더 안쪽 줄
+    h-14 flex items-stretch gap-8 px-5
+    -> flex-wrap items-center gap-x-8 px-4  +  sm:h-14 sm:flex-nowrap sm:items-stretch sm:px-5
+    브랜드 Link : order-1 h-12 shrink-0 self-center sm:h-auto
+    관리자 박스 : order-2 shrink-0 sm:order-3 (ml-auto 유지)
+- src/components/NavTabs.tsx
+    nav  : order-3 h-11 w-full gap-3 overflow-x-auto
+           sm:order-2 sm:h-full sm:w-auto sm:gap-6 sm:overflow-x-visible
+    링크 : shrink-0 whitespace-nowrap 추가 (찌그러짐 자체를 막는다)
+    밑줄 : -bottom-px -> bottom-0 sm:-bottom-px
+           모바일 nav 가 overflow-x-auto 라 상자 밖 1px 이 잘리기 때문.
+
+즉 640px(sm) 미만이면 탭이 통째로 둘째 줄로 내려가고, 그 이상은 기존 한 줄 그대로다.
+탭 줄은 360px 화면에서 ~344px 로 들어간다. 더 좁으면 가로 스크롤로 넘어간다.
+
+[검증]
+  tsc --noEmit / eslint --max-warnings=0 : 통과 (exit 0)
+  사용자가 3000 포트에 다시 띄운 dev 서버로 확인(읽기만 함, 끄지 않았다):
+    - 헤더/nav/관리자 박스에 새 class 문자열이 그대로 실려 나온다.
+    - 컴파일된 CSS(src_app_globals_*.css)에 새로 쓴 유틸이 전부 존재:
+      order-2/3, w-full, h-11, gap-3, overflow-x-auto, flex-wrap, gap-x-8, px-4,
+      shrink-0, whitespace-nowrap, bottom-0 및 sm: 변형 10종 + sm:-bottom-px.
+    - sm 브레이크포인트 = min-width 40rem(640px) 확인.
+  못 한 것: 브라우저 드라이버가 없어 실제 모바일 폭 픽셀 렌더는 확인 못 했다.
+           마크업과 CSS 존재까지만 확인했으므로 실기기 확인이 필요하다.
+
+[남은 일]
+  - 헤더 말고 다른 페이지(명단 표, 시간표 등)의 모바일 폭은 이번에 안 봤다.
+
+--- 2026-08-19 23:23:17 ---------------------------------------------
+[PROMPT]
+푸시해줘

@@ -69,7 +69,7 @@ function PostCard({ post, href }: { post: Post; href: string }) {
             </h3>
           </div>
 
-          {excerpt && <p className="mt-1.5 line-clamp-1 text-[13px] leading-snug text-dim">{excerpt}</p>}
+          {excerpt && <p className="mt-1.5 line-clamp-1 text-[16px] leading-snug text-dim">{excerpt}</p>}
         </div>
 
         <time dateTime={post.created_at} className="tnum text-[11.5px] text-faint">
