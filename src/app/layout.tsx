@@ -6,9 +6,14 @@ import { RACE_NAME, SERVER_NAME, TARGET_LEGION } from "@/lib/constants";
 import { isLocalDb } from "@/lib/db";
 import "./globals.css";
 
+const SITE_NAME = `${SERVER_NAME} ${TARGET_LEGION}`;
+
+// 링크를 공유했을 때 카카오/디스코드 미리보기에 "시엘 블랙" 한 줄만 뜨게 한다.
+// description 을 두면 미리보기에 설명줄이 같이 붙으므로 넣지 않는다.
 export const metadata: Metadata = {
-  title: `${TARGET_LEGION}`,
-  description: `아이온2 ${SERVER_NAME} 서버 ${TARGET_LEGION} 레기온 공격대 편성 매니저`,
+  title: SITE_NAME,
+  openGraph: { title: SITE_NAME, type: "website", locale: "ko_KR" },
+  twitter: { card: "summary", title: SITE_NAME },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

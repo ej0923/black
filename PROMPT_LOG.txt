@@ -942,3 +942,32 @@ lint 처리 두 가지 (react-hooks 규칙이 새로 잡는 것들):
 [PROMPT]
 <ide_opened_file>The user opened the file d:\aion2black\.env.local in the IDE. This may or may not be related to the current task.</ide_opened_file>
 푸시해줘
+
+--- 2026-08-21 00:27:56 ---------------------------------------------
+[PROMPT]
+<ide_opened_file>The user opened the file d:\aion2black\.env.local in the IDE. This may or may not be related to the current task.</ide_opened_file>
+다른사람한테 링크를 보냈을때 공격대 매니저 어쩌구로 뜨는데 그렇게 말고 그냥 '시엘 블랙' 으로 뜨게 해줘
+
+[작업]
+  src/app/layout.tsx 의 metadata 만 손댔다.
+  - 전: title = "블랙", description = "아이온2 시엘 서버 블랙 레기온 공격대 편성 매니저"
+    → 링크 미리보기에 설명줄("...공격대 편성 매니저")이 같이 떴다.
+  - 후: SITE_NAME = `${SERVER_NAME} ${TARGET_LEGION}` = "시엘 블랙" 상수를 두고
+    title / openGraph.title / twitter.title 을 전부 여기에 맞췄다.
+    description 은 지웠다 — 남겨두면 og:description 이 그대로 미리보기 둘째 줄로 나온다.
+    openGraph 에 type:"website", locale:"ko_KR" 만 추가. og 이미지는 없으므로
+    metadataBase 도 필요 없다(상대경로 URL 필드를 안 쓴다).
+  - siteName 은 일부러 안 넣었다. 디스코드에서 제목 위에 같은 문구가 한 번 더 찍힌다.
+
+[검증]
+  npx tsc --noEmit : 통과 (출력 없음)
+  못 한 것: 실제 카카오/디스코드 미리보기는 배포 후에만 확인 가능.
+           카카오는 OG 를 캐시하므로 배포해도 예전 문구가 한동안 남을 수 있다.
+
+--- 2026-08-21 00:37:29 ---------------------------------------------
+[PROMPT]
+디스코드로 보냈는데 아직도 그대로 떠. 디버거에서 캐시 초기화도 했는데도
+
+--- 2026-08-21 00:38:21 ---------------------------------------------
+[PROMPT]
+푸시해줘
