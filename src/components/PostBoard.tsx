@@ -175,7 +175,12 @@ function PostRow({
             ▶
           </span>
           {post.pinned && <span className="tag border border-gold/40 bg-gold/12 text-gold">고정</span>}
-          <span className="truncate text-[13.5px] font-semibold text-fg">{post.title}</span>
+          {/* 명예의 전당 글만 금색으로 깜빡인다. 공지사항은 그대로 — globals.css 의 .blink-hall */}
+          <span
+            className={`truncate text-[13.5px] font-semibold ${post.category === "hall" ? "blink-hall" : "text-fg"}`}
+          >
+            {post.title}
+          </span>
         </button>
 
         <time className="shrink-0 text-[11.5px] text-faint" dateTime={post.created_at}>
@@ -202,10 +207,22 @@ function PostRow({
           {post.body_html ? (
             // 서버에서 sanitizeHtml 을 거친 값이다. queries.listPosts 참고.
             // 분류 클래스는 사진 크기 같은 분류별 규칙을 걸기 위한 것 (globals.css).
-            <div
-              className={`prose-post prose-post--${post.category}`}
-              dangerouslySetInnerHTML={{ __html: post.body_html }}
-            />
+            //
+            // 명예의 전당 본문만 오른쪽에서 왼쪽으로 흐른다. 바깥 .marquee 가 넘치는
+            // 부분을 잘라내는 창 역할이라 감싸는 div 가 한 겹 더 필요하다.
+            post.category === "hall" ? (
+              <div className="marquee">
+                <div
+                  className="marquee-track prose-post prose-post--hall"
+                  dangerouslySetInnerHTML={{ __html: post.body_html }}
+                />
+              </div>
+            ) : (
+              <div
+                className={`prose-post prose-post--${post.category}`}
+                dangerouslySetInnerHTML={{ __html: post.body_html }}
+              />
+            )
           ) : (
             <p className="text-[12.5px] text-faint">내용이 없습니다.</p>
           )}

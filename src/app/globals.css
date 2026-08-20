@@ -448,4 +448,87 @@
     line-height: 1;
     letter-spacing: -0.01em;
   }
+
+  /* ── 명예의 전당 강조 ──────────────────────────────── */
+  /*
+    "깜빡임". 켜졌다 꺼지는 하드한 점멸 대신 금색 발광을 넣었다 뺐다 한다 —
+    글자가 아예 사라지면 읽는 도중에 놓치고, 초당 3회를 넘는 점멸은 광과민성
+    발작 유발 기준에 걸린다. 1.6s 주기라 그 기준의 한참 아래다.
+  */
+  @keyframes hall-blink {
+    0%,
+    100% {
+      opacity: 1;
+      text-shadow: 0 0 10px rgb(233 164 58 / 0.55);
+    }
+    50% {
+      opacity: 0.45;
+      text-shadow: none;
+    }
+  }
+  .blink-hall {
+    color: var(--color-gold);
+    animation: hall-blink 1.6s ease-in-out infinite;
+  }
+  /* 움직임을 줄여 달라고 설정한 사용자에게는 멈춘 금색으로만 보인다. */
+  @media (prefers-reduced-motion: reduce) {
+    .blink-hall {
+      animation: none;
+    }
+  }
+
+  /*
+    명예의 전당 본문 — 오른쪽에서 왼쪽으로 한 줄로 흐른다.
+
+    요령은 track 의 padding-left: 100%. 이 100% 는 감싼 .marquee 의 폭이라
+    글이 짧든 길든 항상 화면 오른쪽 밖에서 출발한다. 반대로 translateX 의
+    -100% 는 track 제 폭이라, 글 전체가 왼쪽으로 다 빠져야 한 바퀴가 끝난다.
+    (컨테이너 기준으로 잡으면 짧은 글이 오른쪽 밖에서 시작하지 않는다.)
+
+    속도는 12s 고정이다. 글 길이에 맞춰 늦추려면 폭을 재야 하고 그건 JS 다.
+  */
+  .marquee {
+    overflow: hidden;
+  }
+  .marquee-track {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%;
+    animation: marquee-left 12s linear infinite;
+  }
+  /* 블록 요소가 줄을 바꾸면 한 줄로 흐르지 않는다 — 문단을 인라인으로 눕힌다. */
+  .marquee-track > * {
+    display: inline;
+    margin: 0 0.4em 0 0;
+  }
+  /* 사진·영상이 섞여 있으면 줄 높이에 맞춰 눕혀 같이 흘려보낸다. */
+  .marquee-track img,
+  .marquee-track iframe {
+    display: inline-block;
+    width: auto;
+    max-height: 8em;
+    margin: 0 0.4em 0 0;
+    vertical-align: middle;
+  }
+  @keyframes marquee-left {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  /* 흐르지 않게 하고 평범한 본문으로 되돌린다. 읽을 수는 있어야 한다. */
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      padding-left: 0;
+      white-space: normal;
+      animation: none;
+    }
+    .marquee-track > * {
+      display: revert;
+      margin: revert;
+    }
+  }
 }
+

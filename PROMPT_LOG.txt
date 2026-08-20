@@ -971,3 +971,164 @@ lint 처리 두 가지 (react-hooks 규칙이 새로 잡는 것들):
 --- 2026-08-21 00:38:21 ---------------------------------------------
 [PROMPT]
 푸시해줘
+
+--- 2026-08-21 00:40:30 ---------------------------------------------
+[PROMPT]
+다시 푸시재ㅝ
+
+[작업]
+  "아직도 그대로 뜬다" 의 원인은 캐시가 아니라 미배포였다. metadata 수정이
+  워킹 트리에만 있었다(마지막 커밋 400171e). 디스코드는 배포본을 읽으니 당연.
+  836ccca 로 커밋 후 푸시 → 1차는 403.
+    remote: Permission to ej0923/black.git denied to Moozann.
+    credential.helper=manager 에 Moozann 자격 증명이 물려 있었다.
+    commit author 는 ej0923 로 정상 — author 와 push 인증 계정은 별개다.
+  사용자가 자격 증명 정리한 뒤 재시도 → 400171e..836ccca main -> main 성공.
+
+[검증]
+  git push 성공 출력 확인. 배포/실제 미리보기는 확인 못 했다 —
+  Vercel 빌드 완료 후 디스코드에 ?v=2 붙여 던져봐야 한다(URL 단위 OG 캐시).
+
+--- 2026-08-21 00:42:33 ---------------------------------------------
+[PROMPT]
+관리자비밀번호 **** 으로 변경해줘
+
+[작업]
+  .env.local 의 ADMIN_PASSWORD 한 줄만 교체했다. 다른 줄/BOM 은 그대로
+  (sed 로 값만 가린 구조 diff 로 확인 - 동일).
+  .env* 는 .gitignore 대상이라 커밋에는 안 올라간다.
+
+  보안: PROMPT_LOG.txt 는 git 추적 대상인데 훅이 프롬프트를 원문 그대로
+  적으므로 방금 비밀번호가 평문으로 찍혔다. 해당 줄을 **** 로 마스킹했다.
+  HEAD(836ccca)에는 안 들어갔음을 확인 (git show HEAD:PROMPT_LOG.txt | grep -c = 0).
+  앞으로 비밀번호/키를 프롬프트에 적으면 매번 이 파일에 남는다.
+
+[검증]
+  grep '^ADMIN_PASSWORD' .env.local : 새 값으로 바뀐 것 확인.
+  못 한 것:
+    - dev 서버 재시작 안 함. .env.local 은 기동 시 읽으므로 재시작해야 먹는다.
+    - 배포본(Vercel)의 ADMIN_PASSWORD 는 못 바꿨다. 대시보드 환경변수라
+      리포 밖에 있고, vercel CLI 는 설치돼 있으나 이 프로젝트가 link 도
+      로그인도 안 된 상태다. 사용자가 대시보드에서 직접 바꿔야 한다.
+    - 비번을 바꾸면 adminToken 이 달라져 기존 관리자 쿠키는 전부 무효 -> 재로그인 필요.
+
+--- 2026-08-21 00:45:41 ---------------------------------------------
+[PROMPT]
+**** 으로 바꿔줘.
+
+--- 2026-08-21 01:23:07 ---------------------------------------------
+[PROMPT]
+메인 공지사항 위에 정보공유 카드 세개 뜨게 만들어줘
+
+[작업]
+  홈의 명예의 전당과 공지사항 사이에 정보공유 카드 3장을 넣었다.
+  "공지사항 위"를 문자 그대로 읽어 공지사항 바로 위에 놓았다(맨 위가 아니라).
+
+  src/components/PostCard.tsx (신규)
+    PostTable 안에 있던 PostCard 를 그대로 빼냈다. 홈과 /info 가 같은 카드를
+    쓰게 하려는 것 — 카드 모양을 두 군데서 따로 관리하고 싶지 않다.
+  src/components/PostTable.tsx
+    PostCard 를 import 하도록만 바꿨다. 화면 결과는 이전과 동일.
+    formatDate/firstSentence import 는 PostCard 로 따라가서 여기서는 뺐다.
+  src/app/page.tsx
+    listPosts("info") 를 기존 Promise.all 에 함께 넣었다(직렬 추가 아님).
+    INFO_PREVIEW = 3 로 slice. lg 에서 한 줄에 3장이라 그 수에 맞췄다.
+    헤더는 PostTable 과 같은 민트 바 + 제목 + 개수, 오른쪽에 "더보기" → /info.
+    개수 뱃지는 전체 글 수를 보여준다(3장만 보이므로 더보기의 근거가 된다).
+    글쓰기 버튼은 일부러 안 넣었다 — 쓰기는 /info 에서 한다.
+    info.length === 0 이면 섹션을 통째로 감춘다. 홈은 요약이지 게시판이 아니다.
+    정렬은 listPosts 그대로(고정 → sort_order → 최신). /info 목록의 앞 3개와 같다.
+
+[검증]
+  next typegen + tsc --noEmit : 통과 (exit 0)
+  npm run lint : 통과 (출력 없음)
+  dev 서버를 3100 에 따로 띄워(사용자 3000 을 건드리지 않으려고) 홈 HTML 확인:
+    h2 순서 = 명예의 전당 | 정보공유 | 공지사항  ← 요청한 위치
+    href="/info/{id}" 링크 3개 = 카드 3장 렌더됨
+    "더보기" 링크 존재
+  확인 후 3100 프로세스는 종료했다.
+  못 한 것: 브라우저 드라이버가 없어 실제 렌더/반응형(sm 2열, lg 3열)은 눈으로
+           못 봤다. 마크업·타입·린트까지만.
+
+--- 2026-08-21 01:28:50 ---------------------------------------------
+[PROMPT]
+<ide_opened_file>The user opened the file d:\aion2black\supabase\schema.sql in the IDE. This may or may not be related to the current task.</ide_opened_file>
+명예의 전당에 쓰는 글자가 깜빡이게 해줘. 그리고 명예의전당 정보공유 공지사항 너무 붙어있어서 조금의 여백을 만들어줘
+
+[작업]
+  1) 명예의 전당 글자 깜빡임
+     src/app/globals.css @layer components 끝에 .blink-hall + @keyframes hall-blink 추가.
+     src/components/PostBoard.tsx PostRow 의 제목 span 에 조건부로 붙였다.
+       PostBoard 는 공지사항과 공용이라 post.category === "hall" 로 갈랐다.
+       (globals.css 의 prose-post--{category} 와 같은 방식)
+     의도적으로 이렇게 했다:
+       - 켜짐/꺼짐 하드 점멸이 아니라 opacity 1 <-> 0.45 + 금색 글로우 펄스.
+         글자가 완전히 사라지면 읽는 중에 놓친다. 그리고 초당 3회 넘는 점멸은
+         광과민성 발작 유발 기준이라 1.6s 주기로 한참 아래에 뒀다.
+       - prefers-reduced-motion: reduce 면 애니메이션만 끄고 금색은 남긴다.
+       - 제목만. 본문(prose-post)은 그대로 — 본문 전체가 깜빡이면 못 읽는다.
+  2) 홈 세 칸 간격
+     src/app/page.tsx 의 래퍼 space-y-5 -> space-y-8 (20px -> 32px).
+     명예의 전당/정보공유/공지사항 사이가 한 번에 벌어진다.
+
+[검증]
+  tsc --noEmit / npm run lint : 통과
+  3100 에 dev 를 띄우려다 "Another next dev server is already running (PID 20900,
+  :3000)" 로 막혔다. 사용자 서버가 떠 있어서 거기에 GET 만 했다(읽기 전용).
+    제목 span 클래스: "이번 주 랭포 1위" -> blink-hall / 공지 글 -> text-fg
+      = 명예의 전당에만 붙고 공지사항에는 안 붙었다.
+    h2 순서 = 명예의 전당 | 정보공유 | 공지사항 (그대로)
+    space-y-8 있음 / space-y-5 없음
+    /_next/static/chunks/src_app_globals_*.css 에 hall-blink 키프레임과
+    prefers-reduced-motion 블록이 실제로 실려 나가는 것 확인.
+  못 한 것: 브라우저 드라이버가 없어 "실제로 깜빡이는 것"과 여백의 눈대중은 못 봤다.
+           클래스·CSS 전달까지만 확인.
+
+--- 2026-08-21 01:32:37 ---------------------------------------------
+[PROMPT]
+명예의 전당 본문은 글씨가 오른쪽에서 왼쪽으로 움직게 만들어줘.
+
+[작업]
+  명예의 전당 본문을 오른쪽 -> 왼쪽으로 흐르게 했다. 제목 깜빡임(.blink-hall)은 그대로.
+
+  src/app/globals.css  .marquee / .marquee-track / @keyframes marquee-left 추가
+    핵심은 track 의 padding-left: 100%.
+      이 100% 는 감싼 .marquee 의 폭 -> 글이 짧아도 항상 화면 오른쪽 밖에서 출발.
+      translateX(-100%) 는 track 제 폭 -> 글 전체가 왼쪽으로 다 빠져야 한 바퀴 끝.
+      (둘 다 컨테이너 기준으로 잡으면 짧은 글이 화면 안에서 시작해 버린다.)
+    .marquee-track > * 를 display:inline 으로 눕혔다. 문단이 블록이면 줄이 나뉘어
+    한 줄로 안 흐른다. img/iframe 은 inline-block + max-height:8em 으로 줄에 태웠다.
+    .prose-post img 와 특정도가 같지만 파일에서 뒤에 오므로 이긴다.
+    prefers-reduced-motion: reduce 면 애니메이션 끄고 평범한 본문으로 되돌린다
+    (padding-left:0, white-space:normal, 자식 display/margin revert) — 읽을 수는 있어야 한다.
+    속도는 18s 고정. 글 길이에 맞춰 늦추려면 폭을 재야 하고 그건 JS 라 안 했다.
+
+  src/components/PostBoard.tsx  본문 렌더를 category 로 갈랐다.
+    hall 이면 <div class="marquee"> 로 한 겹 감싼다 — 넘치는 부분을 잘라내는
+    창이 필요해서 div 가 하나 더 든다. 공지사항 경로는 이전과 동일.
+
+[검증]
+  tsc --noEmit / npm run lint : 통과
+  사용자 dev 서버(:3000) 에 GET 만 해서 확인(읽기 전용):
+    class="marquee" 래퍼 있음 / marquee-track prose-post prose-post--hall 있음
+    명예의 전당 본문("가리비")이 그 안에 들어감
+    공지 본문은 여전히 class="prose-post prose-post--notice" (안 건드림)
+    서빙되는 globals CSS 청크에 marquee-left/marquee-track 규칙 7건 확인
+  못 한 것: 브라우저 드라이버가 없어 실제로 흐르는 모양·속도는 못 봤다.
+           마크업과 CSS 전달까지만. 18s 가 빠른지 느린지는 눈으로 봐야 한다.
+
+--- 2026-08-21 01:35:28 ---------------------------------------------
+[PROMPT]
+속도 조금만 빠르게 해줘
+
+[작업]
+  마퀴 속도 18s -> 12s (src/app/globals.css .marquee-track). 주석의 숫자도 같이 고쳤다.
+  한 바퀴 = 글이 오른쪽 밖에서 나와 왼쪽 밖으로 빠질 때까지라, 12s 면 대략 1.5배 빠르다.
+
+[검증]
+  서빙되는 globals CSS 청크에서 animation: marquee-left 12s 확인.
+  못 한 것: 체감 속도는 브라우저에서 봐야 한다.
+
+--- 2026-08-21 01:37:29 ---------------------------------------------
+[PROMPT]
+푸시해줘

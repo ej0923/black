@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { formatDate } from "@/lib/format";
-import { firstSentence } from "@/lib/sanitize";
+import PostCard from "@/components/PostCard";
 import type { Post } from "@/lib/types";
 
 /**
  * 제목을 눌러 들어가는 카드형 게시판. 넓은 화면에서 한 줄에 세 장.
  *
- * 카드에는 제목 한 줄과 본문 첫 문장 한 줄만 싣는다 — 본문 전체는 들어간 글에서 본다.
+ * 카드 자체는 PostCard 가 그린다 — 홈의 정보공유 미리보기와 같은 카드를 쓴다.
  *
  * 읽기는 누구나, 쓰기는 관리자만 — 글쓰기 버튼은 관리자에게만 보이고 실제 차단은
  * /api/posts 의 requireAdmin 이 한다.
@@ -49,33 +48,5 @@ export default function PostTable({
         </ul>
       )}
     </section>
-  );
-}
-
-function PostCard({ post, href }: { post: Post; href: string }) {
-  const excerpt = firstSentence(post.body_html, { skip: post.title });
-
-  return (
-    <li>
-      <Link
-        href={href}
-        className="card group flex h-full min-h-[128px] flex-col justify-between gap-3 px-4 py-4 transition-colors hover:border-line-strong"
-      >
-        <div className="min-w-0">
-          <div className="flex items-start gap-2">
-            {post.pinned && <span className="tag mt-1 shrink-0 border border-gold/40 bg-gold/12 text-gold">고정</span>}
-            <h3 className="line-clamp-1 font-display text-[18px] font-bold leading-snug tracking-[-0.015em] text-fg transition-colors group-hover:text-brand">
-              {post.title}
-            </h3>
-          </div>
-
-          {excerpt && <p className="mt-1.5 line-clamp-1 text-[16px] leading-snug text-dim">{excerpt}</p>}
-        </div>
-
-        <time dateTime={post.created_at} className="tnum text-[11.5px] text-faint">
-          {formatDate(post.created_at)}
-        </time>
-      </Link>
-    </li>
   );
 }
