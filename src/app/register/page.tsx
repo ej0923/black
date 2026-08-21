@@ -24,7 +24,7 @@ type Detail = {
 
 type Step = "search" | "verify" | "done";
 
-const STEPS = ["캐릭터 검색", "정보 확인", "가능 시간"];
+const STEPS = ["캐릭터 검색", "정보 확인", "주 접속시간"];
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -80,7 +80,7 @@ export default function RegisterPage() {
         <p className="label">등록 완료</p>
         <h1 className="mt-2 font-display text-[24px] font-bold text-fg">{detail.nickname}</h1>
         <p className="mt-2 text-[13px] text-dim">
-          가능 시간 {slots.length}칸이 저장되었습니다. 이제 파티에 지원할 수 있습니다.
+          주 접속시간 {slots.length}칸이 저장되었습니다. 이제 파티에 지원할 수 있습니다.
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <Link href="/parties" className="btn btn-primary">
@@ -221,7 +221,7 @@ export default function RegisterPage() {
           </section>
 
           <section className="card mt-4 p-5">
-            <p className="eyebrow mb-3">가능한 시간</p>
+            <p className="eyebrow mb-3">주 접속시간</p>
             <TimetableEditor value={slots} onChange={setSlots} />
 
             <label className="mt-5 block max-w-lg">
@@ -245,7 +245,7 @@ export default function RegisterPage() {
                 {busy ? "등록 중…" : "등록하기"}
               </button>
               {slots.length === 0 && (
-                <span className="text-[12px] text-faint">가능한 시간을 한 칸 이상 선택하세요.</span>
+                <span className="text-[12px] text-faint">주 접속시간을 한 칸 이상 선택하세요.</span>
               )}
             </div>
           </section>

@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             한글 라벨이 min-content(한 글자)까지 찌그러져 세로로 쌓이므로, 좁은 화면에서는
             wrap 으로 탭을 둘째 줄에 통째로 내린다(NavTabs 의 order-3 / w-full).
           */}
-          <div className="mx-auto flex max-w-[1180px] flex-wrap items-center gap-x-8 px-4 sm:h-14 sm:flex-nowrap sm:items-stretch sm:px-5">
+          <div className="mx-auto flex max-w-[1180px] flex-wrap items-center gap-x-3 px-4 sm:h-14 sm:flex-nowrap sm:items-stretch sm:gap-x-8 sm:px-5">
             <Link href="/" className="order-1 flex h-12 shrink-0 items-center gap-2.5 self-center sm:h-auto">
               <span className="font-display text-[22px] font-bold leading-none tracking-[-0.02em] text-fg">
                 {TARGET_LEGION}
@@ -44,7 +44,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
             <NavTabs />
 
-            <div className="order-2 ml-auto flex shrink-0 items-center gap-3 sm:order-3">
+            <div className="order-2 ml-auto flex shrink-0 items-center gap-2 sm:order-3 sm:gap-3">
+              {/*
+                좁은 화면 전용. 넓은 화면에서는 홈 상단의 큰 버튼과 겹치므로 감춘다.
+              */}
+              <Link href="/roster" className="btn btn-ghost btn-sm sm:hidden">
+                멤버목록
+              </Link>
+              <Link href="/register" className="btn btn-flame btn-sm sm:hidden">
+                멤버등록
+              </Link>
+
               <Link
                 href="/admin"
                 className={

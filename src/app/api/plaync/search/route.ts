@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   const keyword = new URL(req.url).searchParams.get("keyword") ?? "";
 
-  if (keyword.trim().length < 2) {
+  if (!keyword.trim()) {
     return NextResponse.json({ list: [] });
   }
 

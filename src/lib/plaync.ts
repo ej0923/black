@@ -112,7 +112,7 @@ function stripHighlight(name: string): string {
 
 export async function searchCharacters(keyword: string, size = 20): Promise<SearchHit[]> {
   const trimmed = keyword.trim();
-  if (trimmed.length < 2) return [];
+  if (!trimmed) return [];
 
   const qs = new URLSearchParams({
     keyword: trimmed,

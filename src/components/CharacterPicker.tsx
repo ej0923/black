@@ -19,7 +19,7 @@ type Props = {
   autoFocus?: boolean;
 };
 
-/** plaync 캐릭터 검색 — 두 글자부터 자동으로 조회한다. */
+/** plaync 캐릭터 검색 — 한 글자부터 자동으로 조회한다. */
 export default function CharacterPicker({ onPick, placeholder, autoFocus }: Props) {
   const [keyword, setKeyword] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
@@ -28,13 +28,13 @@ export default function CharacterPicker({ onPick, placeholder, autoFocus }: Prop
   const [touched, setTouched] = useState(false);
   const reqId = useRef(0);
 
-  // 두 글자 미만이면 아예 조회하지 않는다. 이전 결과는 state 를 비우는 대신
+  // 빈 칸이면 아예 조회하지 않는다. 이전 결과는 state 를 비우는 대신
   // 렌더 단계에서 걸러내어, 이펙트 본문에서 동기적으로 setState 하지 않도록 한다.
   const query = keyword.trim();
-  const active = query.length >= 2;
+  const active = query.length > 0;
 
   useEffect(() => {
-    if (query.length < 2) return;
+    if (!query) return;
 
     const timer = setTimeout(async () => {
       const id = ++reqId.current;
@@ -73,7 +73,7 @@ export default function CharacterPicker({ onPick, placeholder, autoFocus }: Prop
             setKeyword(e.target.value);
             setTouched(true);
           }}
-          placeholder={placeholder ?? "캐릭터 닉네임 (2글자 이상)"}
+          placeholder={placeholder ?? "캐릭터 닉네임"}
           aria-label="캐릭터 검색"
         />
         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11.5px] text-faint">

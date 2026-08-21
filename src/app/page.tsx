@@ -30,9 +30,9 @@ export default async function HomePage() {
           <h1 className="font-display text-[26px] font-bold leading-tight tracking-[-0.02em] text-fg">
             {TARGET_LEGION} 레기온
           </h1>
-          <p className="mt-1.5 text-[13px] text-dim">명예의 전당과 공지사항입니다. 글은 관리자만 올릴 수 있습니다.</p>
         </div>
-        <div className="flex gap-2">
+        {/* 좁은 화면에서는 헤더 "공대모집" 메뉴에 같은 링크가 있으니 여기선 감춘다. */}
+        <div className="hidden gap-2 sm:flex">
           <Link href="/roster" className="btn btn-ghost">
             멤버목록
           </Link>
