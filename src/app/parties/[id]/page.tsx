@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PartyDetail from "@/components/PartyDetail";
 import SetupNotice from "@/components/SetupNotice";
+import { isAdmin } from "@/lib/admin";
 import { getParty, getPartyMembers, listMembers } from "@/lib/queries";
 import type { Member, Party } from "@/lib/types";
 
@@ -24,6 +25,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
 
   if (!loaded) notFound();
   const { party, applicants, allMembers } = loaded;
+  const admin = await isAdmin();
 
   return (
     <div>
@@ -40,7 +42,7 @@ export default async function PartyPage({ params }: { params: Promise<{ id: stri
         <span className="tnum ml-auto font-mono text-[12px] text-faint">지원자 {applicants.length}명</span>
       </div>
 
-      <PartyDetail party={party} applicants={applicants} allMembers={allMembers} />
+      <PartyDetail party={party} applicants={applicants} allMembers={allMembers} admin={admin} />
     </div>
   );
 }

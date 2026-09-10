@@ -12,9 +12,10 @@ type Props = {
   party: Party;
   applicants: Member[];
   allMembers: Member[];
+  admin: boolean;
 };
 
-export default function PartyDetail({ party, applicants, allMembers }: Props) {
+export default function PartyDetail({ party, applicants, allMembers, admin }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,10 +135,30 @@ export default function PartyDetail({ party, applicants, allMembers }: Props) {
 
       {/* ── 지원자 ─────────────────────────────────────────── */}
       <section className="card overflow-hidden">
-        <div className="thead">
+        <div className="thead flex items-center justify-between gap-2">
           <span className="eyebrow">
             지원자 <span className="tnum text-fg">{applicants.length}</span>
           </span>
+
+          {admin && applicants.length > 0 && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                const ok = confirm(
+                  `파티 ${party.code} 에 지원한 ${applicants.length}명의 가능 시간을 모두 비웁니다.\n` +
+                    "멤버 등록과 지원 내역은 그대로 남습니다.\n" +
+                    "가능 시간은 멤버마다 하나라서, 다른 파티에도 지원한 사람은 그쪽에서도 비워집니다.\n\n" +
+                    "계속할까요?",
+                );
+                if (!ok) return;
+                call(() => fetch(`/api/parties/${party.id}/reset-slots`, { method: "POST" }));
+              }}
+              className="btn btn-danger btn-sm"
+            >
+              지원자 시간 초기화
+            </button>
+          )}
         </div>
 
         {applicants.length === 0 ? (

@@ -27,10 +27,16 @@ type Props = {
 /**
  * 지원자들의 가능 시간 집계표.
  * 각 칸에 그 시간에 가능한 인원수가 뜨고, 마우스를 올리면 닉네임 목록이 뜬다.
+ * 가능한 사람 아래에는 그 시간에 안 되는 사람도 '불가' 로 같이 보여준다.
  */
 export default function TimetableHeatmap({ members, highlight = [] }: Props) {
   const index = useMemo(() => buildSlotIndex(members), [members]);
   const highlighted = useMemo(() => new Set(highlight), [highlight]);
+
+  // 시간을 등록한 사람만 '불가' 판정 대상이다.
+  // 아예 등록을 안 한 사람은 안 되는 게 아니라 모르는 것이라, 따로 표시한다.
+  const scheduled = useMemo(() => members.filter((m) => (m.available_slots?.length ?? 0) > 0), [members]);
+  const unset = useMemo(() => members.filter((m) => (m.available_slots?.length ?? 0) === 0), [members]);
 
   const max = useMemo(() => {
     let m = 0;
@@ -66,6 +72,8 @@ export default function TimetableHeatmap({ members, highlight = [] }: Props) {
                   day={day}
                   hour={hour}
                   members={here}
+                  scheduled={scheduled}
+                  unset={unset}
                   max={max}
                   highlighted={highlighted.has(slot)}
                 />
@@ -82,17 +90,27 @@ function HeatCell({
   day,
   hour,
   members,
+  scheduled,
+  unset,
   max,
   highlighted,
 }: {
   day: number;
   hour: number;
   members: Member[];
+  scheduled: Member[];
+  unset: Member[];
   max: number;
   highlighted: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const count = members.length;
+
+  // 이 시간에 가능하다고 찍지 않은 지원자 = 불가
+  const busy = useMemo(() => {
+    const ok = new Set(members.map((m) => m.id));
+    return scheduled.filter((m) => !ok.has(m.id));
+  }, [members, scheduled]);
 
   // Floating UI 가 화면 밖으로 나가면 알아서 뒤집고 밀어 넣는다.
   // 첫 줄이나 가장자리 칸에서 툴팁이 잘리던 문제가 이걸로 사라진다.
@@ -158,6 +176,29 @@ function HeatCell({
                 </li>
               ))}
             </ul>
+
+            {busy.length > 0 && (
+              <div className="mt-1.5 border-t border-line pt-1.5">
+                <div className="mb-0.5 flex items-baseline gap-1.5">
+                  <span className="font-display text-[11.5px] font-bold text-[#f05a5a]">불가</span>
+                  <span className="tnum text-[11px] text-[#f05a5a]/70">{busy.length}명</span>
+                </div>
+                <ul className="flex flex-wrap gap-x-2 gap-y-0.5">
+                  {busy.map((m) => (
+                    <li key={m.id} className="whitespace-nowrap text-[12px] text-[#e08d8d]">
+                      {m.nickname}
+                      <span className={`ml-1 text-[10px] ${classColor(m.class_name)}`}>{m.class_name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {unset.length > 0 && (
+              <div className="mt-1.5 border-t border-line pt-1.5 text-[11.5px] text-gold/75">
+                시간 미등록 {unset.map((m) => m.nickname).join(", ")}
+              </div>
+            )}
           </div>
         </FloatingPortal>
       )}

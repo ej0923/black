@@ -288,6 +288,21 @@ export function createLocalRepo(): Repo {
       });
     },
 
+    async clearPartySlots(partyId) {
+      return mutate((s) => {
+        const ids = new Set(s.applications.filter((a) => a.party_id === partyId).map((a) => a.member_id));
+        const now = new Date().toISOString();
+        let cleared = 0;
+        for (const member of s.members) {
+          if (!ids.has(member.id)) continue;
+          member.available_slots = [];
+          member.updated_at = now;
+          cleared++;
+        }
+        return cleared;
+      });
+    },
+
     async listPosts(category) {
       const { posts } = await serialize(read);
       return posts

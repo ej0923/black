@@ -56,6 +56,11 @@ export interface Repo {
   listPartyMemberIds(partyId: string): Promise<string[]>;
   applyToParty(partyId: string, memberId: string): Promise<void>;
   cancelApplication(partyId: string, memberId: string): Promise<void>;
+  /**
+   * 그 파티에 지원한 멤버들의 available_slots 만 비운다.
+   * 멤버 등록도, 지원 내역도 지우지 않는다. 비운 인원수를 돌려준다.
+   */
+  clearPartySlots(partyId: string): Promise<number>;
 
   /** 고정글 먼저, 그다음 sort_order, 그다음 최신순 */
   listPosts(category?: PostCategory): Promise<Post[]>;

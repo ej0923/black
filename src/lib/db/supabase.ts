@@ -130,6 +130,19 @@ export function createSupabaseRepo(): Repo {
       if (error) fail(error.message);
     },
 
+    // 지원 행과 멤버 행은 건드리지 않고, 그 파티 지원자의 가능시간 배열만 비운다.
+    async clearPartySlots(partyId) {
+      const { data, error } = await db().from("applications").select("member_id").eq("party_id", partyId);
+      if (error) fail(error.message);
+
+      const ids = (data ?? []).map((row) => row.member_id as string);
+      if (ids.length === 0) return 0;
+
+      const { error: updateError } = await db().from("members").update({ available_slots: [] }).in("id", ids);
+      if (updateError) fail(updateError.message);
+      return ids.length;
+    },
+
     async listPosts(category) {
       let query = db().from("posts").select("*");
       if (category) query = query.eq("category", category);

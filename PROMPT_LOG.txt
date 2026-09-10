@@ -1180,3 +1180,39 @@ lint 처리 두 가지 (react-hooks 규칙이 새로 잡는 것들):
 --- 2026-08-21 10:14:16 ---------------------------------------------
 [PROMPT]
 푸시해줘
+
+--- 2026-08-21 10:33:44 ---------------------------------------------
+[PROMPT]
+<ide_opened_file>The user opened the file d:\aion2black\supabase\schema.sql in the IDE. This may or may not be related to the current task.</ide_opened_file>
+앞으로 내가 지시하는것 이외에 다른것도 네가 창의적으로 작업하게되면 나한테 질문으로 물어봐줘.
+
+--- 2026-09-10 16:12:24 ---------------------------------------------
+[PROMPT]
+공대 지원 페이지 숫자 위에 안되는사람도 '불가' 라고  빨간글씨로 뜨게 만들어줘. 각 파티에 지원한사람들 시간 초기화를 할수 있는 버튼을 각 파티 페이지에 만들어줘. 명심해!! 멤버 등록한 사람 전체가 지워지면 안되고 그 파티에 지원한 사람들 시간만 초기화 되야돼
+
+[작업]
+  1) 타임테이블 툴팁에 '불가' 추가. src/components/TimetableHeatmap.tsx
+     칸에 마우스를 올리면 가능한 사람 아래로 그 시간에 안 되는 지원자를
+     빨간 '불가 N명' 머리와 함께 나열한다.
+     가능시간을 아예 등록 안 한 사람은 '불가'가 아니라 기존처럼 금색
+     '시간 미등록' 줄로 따로 뺐다 (안 되는 게 아니라 모르는 것이라서).
+     판정 대상 목록(scheduled/unset)은 표 단위로 한 번만 계산해 칸에 내려준다.
+  2) 파티별 "지원자 시간 초기화" 버튼. 지원자 카드 머리 오른쪽, 관리자에게만 보인다.
+     src/components/PartyDetail.tsx (admin prop 추가), src/app/parties/[id]/page.tsx
+     confirm 으로 대상 인원수와 "멤버 등록/지원 내역은 남는다"를 먼저 알린다.
+     POST /api/parties/[id]/reset-slots — 관리자 전용(requireAdmin).
+     Repo.clearPartySlots(partyId) 신설: applications 에서 그 파티의 member_id 만
+     모아 members.available_slots 를 [] 로 update. 멤버 행도 지원 행도 건드리지 않는다.
+     supabase/local 두 구현 모두 추가. 스키마 변경 없음 -> 마이그레이션 파일 없음.
+
+[검증]
+  next typegen / tsc --noEmit / eslint / next build 통과.
+  못 한 것: 실제 Supabase 에 대고 초기화를 눌러보지는 않았다.
+  알아둘 것: 가능시간은 멤버당 하나뿐이라, 여러 파티에 지원한 사람을 초기화하면
+  다른 파티 표에서도 비워진다. 파티별로 시간을 따로 갖게 하려면 스키마가 바뀌어야 한다.
+  버튼은 관리자 모드에서만 보이게 했다 (파티 삭제·멤버 삭제와 같은 등급으로 봤다).
+  누구나 누를 수 있게 하려면 말해달라.
+
+--- 2026-09-10 16:19:59 ---------------------------------------------
+[PROMPT]
+푸시해줘.
